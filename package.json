@@ -1,0 +1,13 @@
+{
+  "name": "godoy-auto-care-manager",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Protótipo local de gestão da Godoy Auto Care",
+  "scripts": {
+    "test": "node tests/domain.test.cjs",
+    "test:e2e": "node tests/e2e.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.57.0"
+  }
+}
