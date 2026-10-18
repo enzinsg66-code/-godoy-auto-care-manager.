@@ -1,0 +1,17 @@
+GODOY AUTO CARE MANAGER — V1
+
+COMO USAR
+1. Abra index.html em um navegador de computador para testar.
+2. Cadastre um cliente e veículo na aba Clientes.
+3. Crie agendamentos na aba Agenda.
+4. Registre inspeções na aba Fichas.
+5. Marque atendimentos concluídos e registre despesas para visualizar os indicadores.
+6. Na aba Dados, baixe backups JSON regularmente.
+
+IMPORTANTE
+- Protótipo funcional local, sem login e sem banco de dados online.
+- Os registros ficam no localStorage do navegador utilizado.
+- Abrir o mesmo arquivo em outro navegador/dispositivo NÃO sincroniza os dados.
+- Evite dados pessoais reais até adicionar autenticação, hospedagem HTTPS, banco seguro e política de backup.
+- Para instalar no iPhone como aplicativo PWA, será necessário publicar em HTTPS e acrescentar manifesto/service worker.
+- Não confunda faturamento estimado de serviços concluídos com pagamentos efetivamente recebidos.
