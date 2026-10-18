@@ -1,12 +1,38 @@
-GODOY AUTO CARE MANAGER — V1
+GODOY AUTO CARE MANAGER — V1.1 / PRIMEIRA ETAPA LOCAL
 
 COMO USAR
-1. Abra index.html em um navegador de computador para testar.
+1. Mantenha index.html, styles.css, domain.js e app.js juntos na mesma pasta.
+   Abra index.html em um navegador moderno (computador ou celular) para testar.
 2. Cadastre um cliente e veículo na aba Clientes.
 3. Crie agendamentos na aba Agenda.
 4. Registre inspeções na aba Fichas.
-5. Marque atendimentos concluídos e registre despesas para visualizar os indicadores.
-6. Na aba Dados, baixe backups JSON regularmente.
+5. Marque atendimentos concluídos. Isso gera valor a receber, sem confirmar pagamento.
+6. No Financeiro, registre cada pagamento (inclusive parcial), sua data e forma.
+   O total pago não pode exceder o valor do atendimento. Registre também as despesas.
+7. Na aba Dados, baixe backups JSON regularmente. Importar substitui todos os
+   registros atuais após validação e confirmação; exporte uma cópia antes.
+
+ALTERAÇÕES DESTA ETAPA
+- Validação de registros, referências, datas, horários, valores e versão dos backups.
+- Textos e identificadores importados são tratados como texto na interface.
+- A tela confirma a operação somente depois de salvar no navegador.
+- Dados locais corrompidos bloqueiam a gravação automática. Na aba Dados, baixe
+  o conteúdo original para análise ou importe um backup válido.
+- Alterações em outra aba bloqueiam novas gravações até recarregar a página.
+- Indicadores separam serviços concluídos, pagamentos, valores a receber e despesas.
+- Rótulos de formulários, foco de teclado e visualização de fichas acessíveis.
+
+COMPATIBILIDADE E RECUPERAÇÃO
+- A chave local godoy_manager_v1 foi mantida. Registros V1 válidos são lidos
+  sem sobrescrever o armazenamento. A próxima gravação usa o esquema V2.
+- Backups V1 e V2 são aceitos, até 10 MB; a exportação gera um backup V2 compacto.
+  A gravação também respeita esse limite para garantir a restauração dos backups.
+- A V1 não tinha pagamentos. Seus serviços concluídos continuam a receber até
+  que você registre os pagamentos; não criamos recebimentos automaticamente.
+- Um backup inválido é rejeitado inteiro, mantendo os dados atuais.
+- Em falha de gravação, os dados anteriores e o formulário são preservados.
+- Para migrar entre arquivo local, outro navegador ou endereço HTTP, exporte
+  e importe o backup. O armazenamento é separado por navegador e origem.
 
 IMPORTANTE
 - Protótipo funcional local, sem login e sem banco de dados online.
@@ -14,4 +40,23 @@ IMPORTANTE
 - Abrir o mesmo arquivo em outro navegador/dispositivo NÃO sincroniza os dados.
 - Evite dados pessoais reais até adicionar autenticação, hospedagem HTTPS, banco seguro e política de backup.
 - Para instalar no iPhone como aplicativo PWA, será necessário publicar em HTTPS e acrescentar manifesto/service worker.
-- Não confunda faturamento estimado de serviços concluídos com pagamentos efetivamente recebidos.
+- Saldo de caixa parcial = pagamentos recebidos menos despesas registradas.
+  Não representa lucro líquido. O ticket médio usa os valores dos serviços concluídos.
+- Os indicadores somam todos os registros; ainda não há filtro por período.
+- Não há edição de registros, múltiplos veículos por cliente ou histórico de auditoria
+  permanente nesta etapa. Revisão desses requisitos fica para o próximo escopo.
+- Nenhuma hospedagem, publicação ou serviço pago foi configurado nesta etapa.
+
+ARQUIVOS E VERIFICAÇÃO
+- index.html: estrutura; styles.css: apresentação; app.js: interface e ações;
+  domain.js: validação, persistência, migração e cálculos.
+- docs/AUDITORIA.md: auditoria do original, correções e limites da etapa.
+- Os testes não usam dados reais nem serviços externos.
+- Requer Node.js 20+ apenas para testes, não para usar o aplicativo:
+  npm test
+- Testes no navegador: npm install, npx playwright install chromium e
+  npm run test:e2e. GODOY_BROWSER pode apontar para um Chromium já instalado.
+  Playwright é somente dependência de desenvolvimento.
+- A suíte de interface usa HTTP local temporário em 127.0.0.1 e encerra o servidor
+  ao terminar. Não publica o aplicativo. No ambiente gerenciado, file:// foi
+  bloqueado pela política do Chromium; a abertura direta não foi verificada nele.
