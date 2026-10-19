@@ -28,11 +28,13 @@ button:disabled{opacity:.6}#logout{background:#303030;color:white}#status{min-he
 </form>
 <section id="logged" hidden>
 <p>Login confirmado! Esta página ainda não exibe nem sincroniza dados da empresa.</p>
+<button id="openManager" type="button" hidden>Abrir painel (somente leitura)</button>
 <button id="logout" type="button">Sair</button>
 </section>
 <p id="status" role="status" aria-live="polite"></p>
 <small>Protótipo de autenticação. Não use com dados reais.</small>
 </main>
+<div id="managerMount" hidden></div>
 <script>
 window.GODOY_SUPABASE = Object.freeze({
   url: "https://xuwkfjnufpljxcibdqti.supabase.co",
@@ -49,6 +51,7 @@ window.GODOY_SUPABASE = Object.freeze({
   const status = document.getElementById('status');
   const submit = document.getElementById('submit');
   let accessToken = null;
+  let cloudDocument = null;
   const endpoint = config.url.replace(/\/$/, '') + '/auth/v1/token?grant_type=password';
   const headers = {'Content-Type':'application/json', 'apikey':config.publishableKey};
   form.addEventListener('submit', async event => {
@@ -74,6 +77,8 @@ window.GODOY_SUPABASE = Object.freeze({
       try {
         const user = await window.GodoyCloud.user(accessToken);
         const document = await window.GodoyCloud.load(accessToken, user.id);
+        cloudDocument = document ? document.payload : window.GodoyData?.fresh?.() || null;
+        document.getElementById('openManager').hidden = false;
         status.textContent = document
           ? 'Acesso autorizado. Documento na nuvem encontrado (revisão ' + document.revision + ').'
           : 'Acesso autorizado. Nenhum documento na nuvem ainda; seus dados locais não foram alterados.';
@@ -86,9 +91,33 @@ window.GODOY_SUPABASE = Object.freeze({
       submit.disabled = false;
     }
   });
+  document.getElementById('openManager').addEventListener('click', async () => {
+    try {
+      if (!accessToken) throw Error('Sessão encerrada.');
+      const user = await window.GodoyCloud.user(accessToken);
+      const latest = await window.GodoyCloud.load(accessToken, user.id);
+      const data = latest ? latest.payload : {schemaVersion:2,customers:[],appointments:[],inspections:[],expenses:[],payments:[]};
+      const script = document.createElement('script');
+      script.src = 'domain.js';
+      document.head.append(script);
+      await new Promise((resolve,reject) => { script.onload=resolve; script.onerror=reject; });
+      window.GODOY_CLOUD_DOCUMENT = window.GodoyData.validateData(data);
+      const css = document.createElement('link');
+      css.rel='stylesheet';css.href='styles.css';document.head.append(css);
+      const mount = document.getElementById('managerMount');
+      mount.innerHTML = `<div class="app"><aside class="sidebar"><div class="brand">GODOY <span>AUTO CARE</span><small>MANAGER / V3 PRÉVIA</small></div><nav class="nav" id="desktopNav"></nav><div class="sidefoot">Prévia somente leitura</div></aside><main class="main"><header><div><h1 id="pageTitle" tabindex="-1">Visão geral</h1><p id="pageSub"></p></div><div><span class="pill">Nuvem • somente leitura</span> <button class="btn secondary" id="cloudLogout">Sair</button></div></header><div id="storageNotice" role="alert" class="notice hidden"></div><div id="feedback" role="status" class="notice hidden"></div><div id="view"></div></main></div><nav class="mobile-nav" id="mobileNav"></nav><dialog id="inspectionDialog" aria-labelledby="inspectionTitle"><h2 id="inspectionTitle">Ficha de inspeção</h2><pre></pre><form method="dialog"><button class="btn">Fechar</button></form></dialog>`;
+      mount.hidden = false;
+      document.querySelector('body > main').hidden = true;
+      document.body.style.display = 'block';
+      document.getElementById('cloudLogout').onclick = () => document.getElementById('logout').click();
+      const app = document.createElement('script');app.src='cloud-preview.js';document.body.append(app);
+      app.onerror=()=>{mount.hidden=true;document.querySelector('body > main').hidden=false;status.textContent='Falha ao carregar prévia.';};
+    } catch (error) { status.textContent='Não foi possível abrir a prévia: '+error.message; }
+  });
   document.getElementById('logout').addEventListener('click', async () => {
     const token = accessToken;
     accessToken = null;
+    if (document.getElementById('managerMount').hidden === false) { window.location.reload(); return; }
     form.hidden = false;
     logged.hidden = true;
     status.textContent = 'Sessão local encerrada.';
