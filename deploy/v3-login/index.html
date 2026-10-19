@@ -33,7 +33,12 @@ button:disabled{opacity:.6}#logout{background:#303030;color:white}#status{min-he
 <p id="status" role="status" aria-live="polite"></p>
 <small>Protótipo de autenticação. Não use com dados reais.</small>
 </main>
-<script src="supabase-config.js"></script>
+<script>
+window.GODOY_SUPABASE = Object.freeze({
+  url: "https://xuwkfjnufpljxcibdqti.supabase.co",
+  publishableKey: "sb_publishable_XCS9SOeEz6mbCFxV5Lw24A_8wjhgY25"
+});
+</script>
 <script>
 'use strict';
 (() => {
