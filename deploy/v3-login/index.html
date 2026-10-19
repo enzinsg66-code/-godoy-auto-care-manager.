@@ -39,6 +39,7 @@ window.GODOY_SUPABASE = Object.freeze({
   publishableKey: "sb_publishable_XCS9SOeEz6mbCFxV5Lw24A_8wjhgY25"
 });
 </script>
+<script src="cloud-store.js"></script>
 <script>
 'use strict';
 (() => {
@@ -69,7 +70,16 @@ window.GODOY_SUPABASE = Object.freeze({
       document.getElementById('password').value = '';
       form.hidden = true;
       logged.hidden = false;
-      status.textContent = 'Autenticação realizada.';
+      status.textContent = 'Autenticação realizada. Verificando acesso aos dados...';
+      try {
+        const user = await window.GodoyCloud.user(accessToken);
+        const document = await window.GodoyCloud.load(accessToken, user.id);
+        status.textContent = document
+          ? 'Acesso autorizado. Documento na nuvem encontrado (revisão ' + document.revision + ').'
+          : 'Acesso autorizado. Nenhum documento na nuvem ainda; seus dados locais não foram alterados.';
+      } catch (error) {
+        status.textContent = 'Login confirmado, mas a verificação dos dados falhou: ' + error.message;
+      }
     } catch (error) {
       status.textContent = error.message || 'Falha de conexão.';
     } finally {
