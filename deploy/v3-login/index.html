@@ -76,11 +76,11 @@ window.GODOY_SUPABASE = Object.freeze({
       status.textContent = 'Autenticação realizada. Verificando acesso aos dados...';
       try {
         const user = await window.GodoyCloud.user(accessToken);
-        const document = await window.GodoyCloud.load(accessToken, user.id);
-        cloudDocument = document ? document.payload : window.GodoyData?.fresh?.() || null;
+        const cloudRow = await window.GodoyCloud.load(accessToken, user.id);
+        cloudDocument = cloudRow ? cloudRow.payload : window.GodoyData?.fresh?.() || null;
         document.getElementById('openManager').hidden = false;
-        status.textContent = document
-          ? 'Acesso autorizado. Documento na nuvem encontrado (revisão ' + document.revision + ').'
+        status.textContent = cloudRow
+          ? 'Acesso autorizado. Documento na nuvem encontrado (revisão ' + cloudRow.revision + ').'
           : 'Acesso autorizado. Nenhum documento na nuvem ainda; seus dados locais não foram alterados.';
       } catch (error) {
         status.textContent = 'Login confirmado, mas a verificação dos dados falhou: ' + error.message;
